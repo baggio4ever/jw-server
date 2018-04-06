@@ -22,28 +22,33 @@ provider:
   runtime: python3.6
 
 # you can overwrite defaults here
-#  stage: dev
+  stage: dev
   region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
+  iamRoleStatements:
+    - Effect: "Allow"
 #      Action:
 #        - "s3:ListBucket"
 #      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
 #    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
+      Action:
+        - "s3:PutObject"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::${self:custom.bucketName}/*"
 #          - - "arn:aws:s3:::"
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
+  environment:
+    'bucketName': '${self:custom.bucketName}'
 #    variable1: value1
+
+custom:
+  bucketName: "jw-server"
 
 # you can add packaging information here
 #package:
@@ -92,13 +97,14 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    jwServerBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+  Outputs:
+     RdsLogs:
+       Description: "Bucket for jw-server"
+       Value:
+         Ref: "jwServerBucket"
