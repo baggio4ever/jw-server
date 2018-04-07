@@ -23,7 +23,7 @@ provider:
 
 # you can overwrite defaults here
   stage: dev
-  region: us-east-1
+  region: ap-southeast-2
 
 # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
@@ -41,6 +41,17 @@ provider:
 #          - - "arn:aws:s3:::"
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
+  
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-*"
 
 # you can define service wide environment variables here
   environment:
@@ -48,7 +59,7 @@ provider:
 #    variable1: value1
 
 custom:
-  bucketName: "jw-server"
+  bucketName: "jw-server2"
 
 # you can add packaging information here
 #package:
@@ -63,8 +74,14 @@ functions:
   hello:
     handler: handler.hello
 
-  snow:
-    handler: handler.snow
+  download_highest_temp:
+    handler: handler.download_highest_temperature
+
+  download_lowest_temp:
+    handler: handler.download_lowest_temperature
+
+  download_snow:
+    handler: handler.download_snow
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -106,6 +123,76 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.bucketName}
+
+    jwHighestDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: place
+            AttributeType: S
+          -
+            AttributeName: date
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: place
+            KeyType: HASH
+          -
+            AttributeName: date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: "jw-highest-${self:provider.stage}"
+
+    jwLowestDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: place
+            AttributeType: S
+          -
+            AttributeName: date
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: place
+            KeyType: HASH
+          -
+            AttributeName: date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: "jw-lowest-${self:provider.stage}"
+
+    jwSnowDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: place
+            AttributeType: S
+          -
+            AttributeName: date
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: place
+            KeyType: HASH
+          -
+            AttributeName: date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: "jw-snow-${self:provider.stage}"
+
   Outputs:
      RdsLogs:
        Description: "Bucket for jw-server"

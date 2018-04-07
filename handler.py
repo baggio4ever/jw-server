@@ -32,6 +32,7 @@ url_lowest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mnt
 # 積雪量
 url_snow = "http://www.data.jma.go.jp/obd/stats/data/mdrr/snc_rct/alltable/snc00_rct.csv"
 
+
 def hello(event, context):
     
     download_csv_upload_to_s3( url_highest,'highest')
@@ -83,7 +84,51 @@ def hello(event, context):
     }
     """
 
-def snow(event, context):
+def download_highest_temperature(event, context):
+    
+    download_csv_upload_to_s3( url_highest,'highest')
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def download_lowest_temperature(event, context):
+    
+    download_csv_upload_to_s3( url_highest,'lowest')
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def download_snow(event, context):
     
     download_csv_upload_to_s3( url_snow,'snow')
 
@@ -106,17 +151,22 @@ def snow(event, context):
 
 
 def download_csv_upload_to_s3(download_url,attr):
-    # URLにアクセスする
+
     now = date.today()
+
+    # ファイル名
     fn = now.strftime('%Y%m%d') + '_'+attr+'.csv'
     fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'_utf8.csv'
 
+    # lambdaローカル保存用パス付きファイル名
     full_fn = '/tmp/' + fn
     full_fn_utf8 = '/tmp/' + fn_utf8
 
+    # URLにアクセスしてファイルに保存
     urllib.request.urlretrieve(download_url,full_fn)
 #    html = urllib.request.urlopen(url)
 
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
     s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
