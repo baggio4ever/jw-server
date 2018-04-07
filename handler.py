@@ -22,15 +22,18 @@ BUCKET_NAME = os.environ['bucketName']
 # 気象庁
 # http://www.data.jma.go.jp/obd/stats/data/mdrr/docs/csv_dl_readme.html
 
+# アクセスするURL
+# 最高気温
+url_highest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mxtemsadext00_rct.csv"
+
+# 最低気温
+url_lowest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mntemsadext00_rct.csv"
+
+# 積雪量
+url_snow = "http://www.data.jma.go.jp/obd/stats/data/mdrr/snc_rct/alltable/snc00_rct.csv"
 
 def hello(event, context):
-    # アクセスするURL
-    # 最高気温
-    url_highest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mxtemsadext00_rct.csv"
-
-    # 最低気温
-    url_lowest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mntemsadext00_rct.csv"
-
+    
     download_csv_upload_to_s3( url_highest,'highest')
     download_csv_upload_to_s3( url_lowest,'lowest')
 
@@ -80,21 +83,48 @@ def hello(event, context):
     }
     """
 
+def snow(event, context):
+    
+    download_csv_upload_to_s3( url_snow,'snow')
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
 def download_csv_upload_to_s3(download_url,attr):
     # URLにアクセスする
     now = date.today()
     fn = now.strftime('%Y%m%d') + '_'+attr+'.csv'
     fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'_utf8.csv'
+
     full_fn = '/tmp/' + fn
     full_fn_utf8 = '/tmp/' + fn_utf8
+
     urllib.request.urlretrieve(download_url,full_fn)
 #    html = urllib.request.urlopen(url)
 
-    s3.upload_file(full_fn, BUCKET_NAME, fn)
+    s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
+    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+
+    s3.upload_file(full_fn, BUCKET_NAME, s3_full_fn)
 
     convert_sjis_to_utf8_2(full_fn,full_fn_utf8)
 
-    s3.upload_file(full_fn_utf8, BUCKET_NAME, fn_utf8)
+    s3.upload_file(full_fn_utf8, BUCKET_NAME, s3_full_fn_utf8)
 
     os.remove(full_fn)
     os.remove(full_fn_utf8)
