@@ -79,26 +79,44 @@ functions:
   download_highest_temp:
     handler: handler.download_highest_temperature
     timeout: 10
+    events:
+      # 日本時間で 23:00 のつもり
+      - schedule: cron(0 14 * * ? *)
 
   download_lowest_temp:
     handler: handler.download_lowest_temperature
     timeout: 10
+    events:
+      # 日本時間で 23:05 のつもり
+      - schedule: cron(5 14 * * ? *)
 
   download_snow:
     handler: handler.download_snow
     timeout: 10
+    events:
+      # 日本時間で 23:10 のつもり
+      - schedule: cron(10 14 * * ? *)
 
   scrape_highest:
     handler: handler.scrape_highest
     timeout: 120
+    events:
+      # 日本時間で 23:15 のつもり
+      - schedule: cron(15 14 * * ? *)
 
   scrape_lowest:
     handler: handler.scrape_lowest
     timeout: 120
+    events:
+      # 日本時間で 23:20 のつもり
+      - schedule: cron(20 14 * * ? *)
 
   scrape_snow:
     handler: handler.scrape_sn
     timeout: 120
+    events:
+      # 日本時間で 23:25 のつもり
+      - schedule: cron(25 14 * * ? *)
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
