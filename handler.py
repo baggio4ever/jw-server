@@ -31,6 +31,10 @@ def hello(event, context):
     # 最低気温
     url_lowest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mntemsadext00_rct.csv"
 
+    download_csv_upload_to_s3( url_highest,'highest')
+    download_csv_upload_to_s3( url_lowest,'lowest')
+
+    '''
     # URLにアクセスする
     now = date.today()
     fn = now.strftime('%Y%m%d') + '.csv'
@@ -47,10 +51,11 @@ def hello(event, context):
 
     os.remove(full_fn)
     os.remove(utf8_full_fn)
+    '''
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
-        "filename": fn,
+#        "filename": fn,
         "input": event
     }
 
@@ -75,6 +80,25 @@ def hello(event, context):
     }
     """
 
+def download_csv_upload_to_s3(download_url,attr):
+    # URLにアクセスする
+    now = date.today()
+    fn = now.strftime('%Y%m%d') + '_'+attr+'.csv'
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'_utf8.csv'
+    full_fn = '/tmp/' + fn
+    full_fn_utf8 = '/tmp/' + fn_utf8
+    urllib.request.urlretrieve(download_url,full_fn)
+#    html = urllib.request.urlopen(url)
+
+    s3.upload_file(full_fn, BUCKET_NAME, fn)
+
+    convert_sjis_to_utf8_2(full_fn,full_fn_utf8)
+
+    s3.upload_file(full_fn_utf8, BUCKET_NAME, fn_utf8)
+
+    os.remove(full_fn)
+    os.remove(full_fn_utf8)
+
 
 def convert_sjis_to_utf8(fn):
     # Shift_JIS ファイルのパス
@@ -92,3 +116,17 @@ def convert_sjis_to_utf8(fn):
     fin.close()
     fout_utf.close()
     return utf8_csv_path
+
+def convert_sjis_to_utf8_2(fn,fn_utf8):
+    # Shift_JIS ファイルのパス
+    shiftjis_csv_path = fn
+    # UTF-8 ファイルのパス
+    utf8_csv_path = fn_utf8
+
+    # 文字コードを utf-8 に変換して保存
+    fin = codecs.open(shiftjis_csv_path, "r", "shift_jis")
+    fout_utf = codecs.open(utf8_csv_path, "w", "utf-8")
+    for row in fin:
+        fout_utf.write(row)
+    fin.close()
+    fout_utf.close()
