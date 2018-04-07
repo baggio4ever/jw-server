@@ -34,6 +34,8 @@ provider:
 #    - Effect: "Allow"
       Action:
         - "s3:PutObject"
+        - "s3:GetObject"
+        - "s3:DeleteObject"
       Resource:
         Fn::Join:
           - ""
@@ -76,12 +78,27 @@ functions:
 
   download_highest_temp:
     handler: handler.download_highest_temperature
+    timeout: 10
 
   download_lowest_temp:
     handler: handler.download_lowest_temperature
+    timeout: 10
 
   download_snow:
     handler: handler.download_snow
+    timeout: 10
+
+  scrape_highest:
+    handler: handler.scrape_highest
+    timeout: 120
+
+  scrape_lowest:
+    handler: handler.scrape_lowest
+    timeout: 120
+
+  scrape_snow:
+    handler: handler.scrape_sn
+    timeout: 120
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -144,8 +161,8 @@ resources:
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: "jw-highest-${self:provider.stage}"
+          WriteCapacityUnits: 4
+        TableName: "${self:provider.stage}-jw-highest"
 
     jwLowestDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
@@ -167,8 +184,8 @@ resources:
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: "jw-lowest-${self:provider.stage}"
+          WriteCapacityUnits: 4
+        TableName: "${self:provider.stage}-jw-lowest"
 
     jwSnowDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
@@ -190,8 +207,8 @@ resources:
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: "jw-snow-${self:provider.stage}"
+          WriteCapacityUnits: 4
+        TableName: "${self:provider.stage}-jw-snow"
 
   Outputs:
      RdsLogs:

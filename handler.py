@@ -86,10 +86,12 @@ def hello(event, context):
 
 def download_highest_temperature(event, context):
     
-    download_csv_upload_to_s3( url_highest,'highest')
+    s3filename = download_csv_upload_to_s3( url_highest,'highest')
+    # ret = scrape_highest_temperature(s3filename)
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
+        "ret":"gj",
         "input": event
     }
 
@@ -108,7 +110,7 @@ def download_highest_temperature(event, context):
 
 def download_lowest_temperature(event, context):
     
-    download_csv_upload_to_s3( url_highest,'lowest')
+    s3filename = download_csv_upload_to_s3( url_highest,'lowest')
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -130,7 +132,7 @@ def download_lowest_temperature(event, context):
 
 def download_snow(event, context):
     
-    download_csv_upload_to_s3( url_snow,'snow')
+    s3filename = download_csv_upload_to_s3( url_snow,'snow')
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -148,6 +150,222 @@ def download_snow(event, context):
     logger.info(response)
 
     return response
+
+
+def scrape_highest(event, context):
+    
+    now = date.today()
+
+    # ファイル名
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'highest'+'_utf8.csv'
+
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
+    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+
+    ret = scrape_highest_temperature(s3_full_fn_utf8,fn_utf8)
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "ret":ret,
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+
+def scrape_lowest(event, context):
+    
+    now = date.today()
+
+    # ファイル名
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'lowest'+'_utf8.csv'
+
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
+    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+
+    ret = scrape_lowest_temperature(s3_full_fn_utf8,fn_utf8)
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "ret":ret,
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def scrape_sn(event, context):
+    
+    now = date.today()
+
+    # ファイル名
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'snow'+'_utf8.csv'
+
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
+    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+
+    ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "ret":ret,
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+
+def scrape_highest_temperature(s3_full_fn,fn):
+    tempFile = '/tmp/'+fn
+    s3.download_file(BUCKET_NAME,s3_full_fn,tempFile)
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table( 'dev-jw-highest' )
+
+    count=0
+    with open(tempFile,newline='') as html:
+        re = csv.reader(html,delimiter=',',quotechar='|')
+        for row in re:
+            if count>0:
+    	        #     県             地域             最高温度
+		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
+                str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                logger.info(str)
+
+                place = row[2]
+                year = row[4]
+                month = row[5]  # csvファイルに0詰めで入っている
+                day = row[6]  # csvファイルに0詰めで入っている
+                date = "{}/{}/{}".format(year,month,day)
+                temperature = row[9]
+                prefecture = row[1]
+                table.put_item(
+                    Item={
+                        "place": place,
+                        "date": date,
+                        "temperature": temperature,
+                        "prefecture": prefecture
+                    }
+                )
+            count+=1
+
+    os.remove(tempFile)
+
+    return [str,count]
+
+
+def scrape_lowest_temperature(s3_full_fn,fn):
+    tempFile = '/tmp/'+fn
+    s3.download_file(BUCKET_NAME,s3_full_fn,tempFile)
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table( 'dev-jw-lowest' )
+
+    count=0
+    with open(tempFile,newline='') as html:
+        re = csv.reader(html,delimiter=',',quotechar='|')
+        for row in re:
+            if count>0:
+    	        #     県             地域             最高温度
+		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
+                str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                logger.info(str)
+
+                place = row[2]
+                year = row[4]
+                month = row[5]  # csvファイルに0詰めで入っている
+                day = row[6]  # csvファイルに0詰めで入っている
+                date = "{}/{}/{}".format(year,month,day)
+                temperature = row[9]
+                prefecture = row[1]
+                table.put_item(
+                    Item={
+                        "place": place,
+                        "date": date,
+                        "temperature": temperature,
+                        "prefecture": prefecture
+                    }
+                )
+            count+=1
+
+    os.remove(tempFile)
+
+    return [str,count]
+
+
+def scrape_snow(s3_full_fn,fn):
+    tempFile = '/tmp/'+fn
+    s3.download_file(BUCKET_NAME,s3_full_fn,tempFile)
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table( 'dev-jw-snow' )
+
+    count=0
+    with open(tempFile,newline='') as html:
+        re = csv.reader(html,delimiter=',',quotechar='|')
+        for row in re:
+            if count>0:
+    	        #     県             地域             最高温度
+		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
+                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                # logger.info(str)
+
+                place = row[2]
+                year = row[4]
+                month = row[5]  # csvファイルに0詰めで入っている
+                day = row[6]  # csvファイルに0詰めで入っている
+                date = "{}/{}/{}".format(year,month,day)
+                depth = row[9]
+                if not depth:
+                    depth = '-'
+                prefecture = row[1]
+                table.put_item(
+                    Item={
+                        "place": place,
+                        "date": date,
+                        "snow_depth": depth,
+                        "prefecture": prefecture
+                    }
+                )
+            count+=1
+
+    os.remove(tempFile)
+
+    return ['',count]
+
+
 
 
 def download_csv_upload_to_s3(download_url,attr):
@@ -178,6 +396,8 @@ def download_csv_upload_to_s3(download_url,attr):
 
     os.remove(full_fn)
     os.remove(full_fn_utf8)
+
+    return s3_full_fn_utf8
 
 
 def convert_sjis_to_utf8(fn):
