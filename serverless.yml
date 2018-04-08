@@ -126,7 +126,7 @@ functions:
       # 日本時間で 23:25 のつもり
       - schedule: cron(25 14 * * ? *)
 
-  scrape_rain:
+  scrape_rain24h:
     handler: handler.scrape_rain
     timeout: 120
     events:

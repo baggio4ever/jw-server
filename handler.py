@@ -61,8 +61,8 @@ def hello(event, context):
     '''
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-#        "filename": fn,
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "filename": fn,
         "input": event
     }
 
@@ -93,8 +93,8 @@ def download_highest_temperature(event, context):
     # ret = scrape_highest_temperature(s3filename)
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "ret":"gj",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "ret":"gj",
         "input": event
     }
 
@@ -113,10 +113,10 @@ def download_highest_temperature(event, context):
 
 def download_lowest_temperature(event, context):
     
-    s3filename = download_csv_upload_to_s3( url_highest,'lowest')
+    s3filename = download_csv_upload_to_s3( url_lowest,'lowest')
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -138,7 +138,7 @@ def download_snow(event, context):
     s3filename = download_csv_upload_to_s3( url_snow,'snow')
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -160,7 +160,7 @@ def download_rain24h(event, context):
     s3filename = download_csv_upload_to_s3( url_rain24h,'rain24h')
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -190,7 +190,7 @@ def scrape_highest(event, context):
     ret = scrape_highest_temperature(s3_full_fn_utf8,fn_utf8)
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -222,7 +222,7 @@ def scrape_lowest(event, context):
     ret = scrape_lowest_temperature(s3_full_fn_utf8,fn_utf8)
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -253,7 +253,7 @@ def scrape_sn(event, context):
     ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -285,7 +285,7 @@ def scrape_rain(event, context):
     ret = scrape_rain24h(s3_full_fn_utf8,fn_utf8)
 
     body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
+        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -318,8 +318,8 @@ def scrape_highest_temperature(s3_full_fn,fn):
             if count>0:
     	        #     県             地域             最高温度
 		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
-                str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
-                logger.info(str)
+                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                # logger.info(str)
 
                 place = row[2]
                 year = row[4]
@@ -328,19 +328,30 @@ def scrape_highest_temperature(s3_full_fn,fn):
                 date = "{}/{}/{}".format(year,month,day)
                 temperature = row[9]
                 prefecture = row[1]
+
+                place_no = row[0]
+                international_place_no = row[3]
+                if not international_place_no:
+                    international_place_no = '-'
+                time = "{}:{}".format(row[11],row[12])
+
                 table.put_item(
                     Item={
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        "prefecture": prefecture
+                        "prefecture": prefecture,
+
+                        "place_no": place_no,
+                        "international_place_no": international_place_no,
+                        "time": time
                     }
                 )
             count+=1
 
     os.remove(tempFile)
 
-    return [str,count]
+    return ['',count]
 
 
 def scrape_lowest_temperature(s3_full_fn,fn):
@@ -357,8 +368,8 @@ def scrape_lowest_temperature(s3_full_fn,fn):
             if count>0:
     	        #     県             地域             最高温度
 		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
-                str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
-                logger.info(str)
+                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                # logger.info(str)
 
                 place = row[2]
                 year = row[4]
@@ -367,19 +378,30 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                 date = "{}/{}/{}".format(year,month,day)
                 temperature = row[9]
                 prefecture = row[1]
+
+                place_no = row[0]
+                international_place_no = row[3]
+                if not international_place_no:
+                    international_place_no = '-'
+                time = "{}:{}".format(row[11],row[12])
+
                 table.put_item(
                     Item={
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        "prefecture": prefecture
+                        "prefecture": prefecture,
+
+                        "place_no": place_no,
+                        "international_place_no": international_place_no,
+                        "time": time
                     }
                 )
             count+=1
 
     os.remove(tempFile)
 
-    return [str,count]
+    return ['',count]
 
 
 def scrape_snow(s3_full_fn,fn):
@@ -408,12 +430,23 @@ def scrape_snow(s3_full_fn,fn):
                 if not depth:
                     depth = '-'
                 prefecture = row[1]
+
+                place_no = row[0]
+                international_place_no = row[3]
+                if not international_place_no:
+                    international_place_no = '-'
+                time = "{}:{}".format(row[7],row[8])
+
                 table.put_item(
                     Item={
                         "place": place,
                         "date": date,
                         "snow_depth": depth,
-                        "prefecture": prefecture
+                        "prefecture": prefecture,
+
+                        "place_no": place_no,
+                        "international_place_no": international_place_no,
+                        "time": time
                     }
                 )
             count+=1
@@ -446,16 +479,27 @@ def scrape_rain24h(s3_full_fn,fn):
                 month = row[5]  # csvファイルに0詰めで入っている
                 day = row[6]  # csvファイルに0詰めで入っている
                 date = "{}/{}/{}".format(year,month,day)
-                depth = row[9]
-                if not depth:
-                    depth = '-'
+                amount = row[11]
+                if not amount:
+                    amount = '-'
                 prefecture = row[1]
+
+                place_no = row[0]
+                international_place_no = row[3]
+                if not international_place_no:
+                    international_place_no = '-'
+                time = "{}:{}".format(row[13],row[14])
+
                 table.put_item(
                     Item={
                         "place": place,
                         "date": date,
-                        "snow_depth": depth,
-                        "prefecture": prefecture
+                        "rainfall_amount": amount,
+                        "prefecture": prefecture,
+
+                        "place_no": place_no,
+                        "international_place_no": international_place_no,
+                        "time": time
                     }
                 )
             count+=1
