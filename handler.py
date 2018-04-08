@@ -29,6 +29,9 @@ url_highest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mx
 # 最低気温
 url_lowest = "http://www.data.jma.go.jp/obd/stats/data/mdrr/tem_rct/alltable/mntemsadext00_rct.csv"
 
+# 24時間降水量
+url_rain24h = "http://www.data.jma.go.jp/obd/stats/data/mdrr/pre_rct/alltable/pre24h00_rct.csv"
+
 # 積雪量
 url_snow = "http://www.data.jma.go.jp/obd/stats/data/mdrr/snc_rct/alltable/snc00_rct.csv"
 
@@ -152,12 +155,34 @@ def download_snow(event, context):
     return response
 
 
+def download_rain24h(event, context):
+    
+    s3filename = download_csv_upload_to_s3( url_rain24h,'rain24h')
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
 def scrape_highest(event, context):
     
     now = date.today()
 
     # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'highest'+'_utf8.csv'
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'highest'+'.csv'
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
@@ -189,7 +214,7 @@ def scrape_lowest(event, context):
     now = date.today()
 
     # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'lowest'+'_utf8.csv'
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'lowest'+'.csv'
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
@@ -220,12 +245,44 @@ def scrape_sn(event, context):
     now = date.today()
 
     # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'snow'+'_utf8.csv'
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'snow'+'.csv'
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "ret":ret,
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+
+def scrape_rain(event, context):
+    
+    now = date.today()
+
+    # ファイル名
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+'rain24h'+'.csv'
+
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
+    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+
+    ret = scrape_rain24h(s3_full_fn_utf8,fn_utf8)
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -367,14 +424,56 @@ def scrape_snow(s3_full_fn,fn):
 
 
 
+def scrape_rain24h(s3_full_fn,fn):
+    tempFile = '/tmp/'+fn
+    s3.download_file(BUCKET_NAME,s3_full_fn,tempFile)
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table( 'dev-jw-rain24h' )
+
+    count=0
+    with open(tempFile,newline='') as html:
+        re = csv.reader(html,delimiter=',',quotechar='|')
+        for row in re:
+            if count>0:
+    	        #     県             地域             最高温度
+		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
+                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                # logger.info(str)
+
+                place = row[2]
+                year = row[4]
+                month = row[5]  # csvファイルに0詰めで入っている
+                day = row[6]  # csvファイルに0詰めで入っている
+                date = "{}/{}/{}".format(year,month,day)
+                depth = row[9]
+                if not depth:
+                    depth = '-'
+                prefecture = row[1]
+                table.put_item(
+                    Item={
+                        "place": place,
+                        "date": date,
+                        "snow_depth": depth,
+                        "prefecture": prefecture
+                    }
+                )
+            count+=1
+
+    os.remove(tempFile)
+
+    return ['',count]
+
+
+
 
 def download_csv_upload_to_s3(download_url,attr):
 
     now = date.today()
 
     # ファイル名
-    fn = now.strftime('%Y%m%d') + '_'+attr+'.csv'
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'_utf8.csv'
+    fn = now.strftime('%Y%m%d') + '_'+attr+'_sjis.csv'
+    fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'.csv'
 
     # lambdaローカル保存用パス付きファイル名
     full_fn = '/tmp/' + fn
@@ -399,7 +498,7 @@ def download_csv_upload_to_s3(download_url,attr):
 
     return s3_full_fn_utf8
 
-
+'''
 def convert_sjis_to_utf8(fn):
     # Shift_JIS ファイルのパス
     shiftjis_csv_path = fn
@@ -416,6 +515,7 @@ def convert_sjis_to_utf8(fn):
     fin.close()
     fout_utf.close()
     return utf8_csv_path
+'''
 
 def convert_sjis_to_utf8_2(fn,fn_utf8):
     # Shift_JIS ファイルのパス

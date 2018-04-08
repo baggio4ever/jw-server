@@ -73,8 +73,8 @@ custom:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
+#  hello:
+#    handler: handler.hello
 
   download_highest_temp:
     handler: handler.download_highest_temperature
@@ -97,6 +97,14 @@ functions:
       # 日本時間で 23:10 のつもり
       - schedule: cron(10 14 * * ? *)
 
+  download_rain24h:
+    handler: handler.download_rain24h
+    timeout: 10
+    events:
+      # 日本時間で 23:15 のつもり
+      - schedule: cron(15 14 * * ? *)
+    
+
   scrape_highest:
     handler: handler.scrape_highest
     timeout: 120
@@ -117,6 +125,13 @@ functions:
     events:
       # 日本時間で 23:25 のつもり
       - schedule: cron(25 14 * * ? *)
+
+  scrape_rain:
+    handler: handler.scrape_rain
+    timeout: 120
+    events:
+      # 日本時間で 23:30 のつもり
+      - schedule: cron(30 14 * * ? *)
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -227,6 +242,29 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 4
         TableName: "${self:provider.stage}-jw-snow"
+
+    jwRain24hDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: place
+            AttributeType: S
+          -
+            AttributeName: date
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: place
+            KeyType: HASH
+          -
+            AttributeName: date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 4
+        TableName: "${self:provider.stage}-jw-rain24h"
 
   Outputs:
      RdsLogs:
