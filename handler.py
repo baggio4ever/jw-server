@@ -190,8 +190,19 @@ def get_s3_file(year,month,day,attr):
     
 
 def scrape_highest(event, context):
-    
-    now = date.today()
+    b = event.get("body")
+    if b is not None:
+        yy = json.loads(event["body"])
+
+        year = yy["year"]
+        month = yy["month"]
+        day = yy["day"]
+    else:
+        now = date.today()
+
+        year = now.year
+        month = now.month
+        day = now.day
 
     '''
     # ファイル名
@@ -202,7 +213,10 @@ def scrape_highest(event, context):
 
     ret = scrape_highest_temperature(s3_full_fn_utf8,fn_utf8)
     '''
-    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'highest')
+    s3_full,s3_fn = get_s3_file(year,month,day,'highest')
+
+    logger.info(s3_full)
+    
     ret = scrape_highest_temperature(s3_full,s3_fn)
     
     body = {

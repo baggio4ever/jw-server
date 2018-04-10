@@ -111,6 +111,11 @@ functions:
     events:
       # 日本時間で 23:15 のつもり
       - schedule: cron(15 14 * * ? *)
+      - http:
+          path: scrape_highest
+          method: post
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
 
   scrape_lowest:
     handler: handler.scrape_lowest
