@@ -266,6 +266,23 @@ resources:
           WriteCapacityUnits: 4
         TableName: "${self:provider.stage}-jw-rain24h"
 
+    jwObservatoryDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: place
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: place
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 4
+        TableName: "${self:provider.stage}-jw-observatory"
+
   Outputs:
      RdsLogs:
        Description: "Bucket for jw-server"

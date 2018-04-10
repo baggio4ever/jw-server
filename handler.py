@@ -10,6 +10,7 @@ import datetime
 import base64
 import codecs
 import boto3
+from decimal import Decimal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -177,10 +178,22 @@ def download_rain24h(event, context):
     return response
 
 
+
+def get_s3_file(year,month,day,attr):
+    # ファイル名
+    fn_utf8 = "{:04}{:02}{:02}_{}.csv".format(year,month,day,attr)
+
+    # S3保存用パス付きファイル名 年/月のフォルダを作る
+    s3_full_fn_utf8 = "{}/{}/{}".format(year,month,fn_utf8)
+
+    return (s3_full_fn_utf8,fn_utf8)
+    
+
 def scrape_highest(event, context):
     
     now = date.today()
 
+    '''
     # ファイル名
     fn_utf8 = now.strftime('%Y%m%d') + '_'+'highest'+'.csv'
 
@@ -188,7 +201,10 @@ def scrape_highest(event, context):
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     ret = scrape_highest_temperature(s3_full_fn_utf8,fn_utf8)
-
+    '''
+    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'highest')
+    ret = scrape_highest_temperature(s3_full,s3_fn)
+    
     body = {
         # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
@@ -213,6 +229,7 @@ def scrape_lowest(event, context):
     
     now = date.today()
 
+    '''
     # ファイル名
     fn_utf8 = now.strftime('%Y%m%d') + '_'+'lowest'+'.csv'
 
@@ -220,6 +237,9 @@ def scrape_lowest(event, context):
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     ret = scrape_lowest_temperature(s3_full_fn_utf8,fn_utf8)
+    '''
+    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'lowest')
+    ret = scrape_lowest_temperature(s3_full,s3_fn)
 
     body = {
         # "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -244,6 +264,7 @@ def scrape_sn(event, context):
     
     now = date.today()
 
+    '''
     # ファイル名
     fn_utf8 = now.strftime('%Y%m%d') + '_'+'snow'+'.csv'
 
@@ -251,7 +272,10 @@ def scrape_sn(event, context):
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
-
+    '''
+    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'snow')
+    ret = scrape_snow(s3_full,s3_fn)
+    
     body = {
         # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
@@ -276,6 +300,7 @@ def scrape_rain(event, context):
     
     now = date.today()
 
+    '''
     # ファイル名
     fn_utf8 = now.strftime('%Y%m%d') + '_'+'rain24h'+'.csv'
 
@@ -283,7 +308,10 @@ def scrape_rain(event, context):
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     ret = scrape_rain24h(s3_full_fn_utf8,fn_utf8)
-
+    '''
+    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'rain24h')
+    ret = scrape_rain24h(s3_full,s3_fn)
+    
     body = {
         # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
@@ -327,6 +355,11 @@ def scrape_highest_temperature(s3_full_fn,fn):
                 day = row[6]  # csvファイルに0詰めで入っている
                 date = "{}/{}/{}".format(year,month,day)
                 temperature = row[9]
+                if temperature:
+                    temperature_val = Decimal(float(temperature))
+                else:
+                    temperature = '-'
+                    temperature_val = Decimal(-999.0)
                 prefecture = row[1]
 
                 place_no = row[0]
@@ -340,10 +373,11 @@ def scrape_highest_temperature(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        "prefecture": prefecture,
+                        # "temperature_val": temperature_val,
+                        # "prefecture": prefecture,
 
-                        "place_no": place_no,
-                        "international_place_no": international_place_no,
+                        # "place_no": place_no,
+                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -351,7 +385,7 @@ def scrape_highest_temperature(s3_full_fn,fn):
 
     os.remove(tempFile)
 
-    return ['',count]
+    return [count]
 
 
 def scrape_lowest_temperature(s3_full_fn,fn):
@@ -377,6 +411,11 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                 day = row[6]  # csvファイルに0詰めで入っている
                 date = "{}/{}/{}".format(year,month,day)
                 temperature = row[9]
+                if temperature:
+                    temperature_val = Decimal( float(temperature) )
+                else:
+                    temperature = '-'
+                    temperature_val = Decimal( -999.0 )
                 prefecture = row[1]
 
                 place_no = row[0]
@@ -390,10 +429,11 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        "prefecture": prefecture,
+                        # "temperature_val": temperature_val,
+                        # "prefecture": prefecture,
 
-                        "place_no": place_no,
-                        "international_place_no": international_place_no,
+                        # "place_no": place_no,
+                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -401,7 +441,7 @@ def scrape_lowest_temperature(s3_full_fn,fn):
 
     os.remove(tempFile)
 
-    return ['',count]
+    return [count]
 
 
 def scrape_snow(s3_full_fn,fn):
@@ -427,8 +467,11 @@ def scrape_snow(s3_full_fn,fn):
                 day = row[6]  # csvファイルに0詰めで入っている
                 date = "{}/{}/{}".format(year,month,day)
                 depth = row[9]
-                if not depth:
+                if depth:
+                    depth_val = Decimal(float(depth))
+                else:
                     depth = '-'
+                    depth_val = Decimal(-999.0)
                 prefecture = row[1]
 
                 place_no = row[0]
@@ -442,10 +485,11 @@ def scrape_snow(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "snow_depth": depth,
-                        "prefecture": prefecture,
+                        # "snow_depth_val": depth_val,
+                        # "prefecture": prefecture,
 
-                        "place_no": place_no,
-                        "international_place_no": international_place_no,
+                        # "place_no": place_no,
+                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -453,7 +497,7 @@ def scrape_snow(s3_full_fn,fn):
 
     os.remove(tempFile)
 
-    return ['',count]
+    return [count]
 
 
 
@@ -480,8 +524,11 @@ def scrape_rain24h(s3_full_fn,fn):
                 day = row[6]  # csvファイルに0詰めで入っている
                 date = "{}/{}/{}".format(year,month,day)
                 amount = row[11]
-                if not amount:
+                if amount:
+                    amount_val = Decimal(float(amount))
+                else:
                     amount = '-'
+                    amount_val = Decimal(-999.0)
                 prefecture = row[1]
 
                 place_no = row[0]
@@ -495,10 +542,11 @@ def scrape_rain24h(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "rainfall_amount": amount,
-                        "prefecture": prefecture,
+                        # "rainfall_amount_val": amount_val,
+                        # "prefecture": prefecture,
 
-                        "place_no": place_no,
-                        "international_place_no": international_place_no,
+                        # "place_no": place_no,
+                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -506,7 +554,7 @@ def scrape_rain24h(s3_full_fn,fn):
 
     os.remove(tempFile)
 
-    return ['',count]
+    return [count]
 
 
 
