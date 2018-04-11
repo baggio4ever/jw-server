@@ -189,7 +189,7 @@ def get_s3_file(year,month,day,attr):
     return (s3_full_fn_utf8,fn_utf8)
     
 
-def scrape_highest(event, context):
+def get_date_to_scrape(event):
     b = event.get("body")
     if b is not None:
         yy = json.loads(event["body"])
@@ -203,6 +203,28 @@ def scrape_highest(event, context):
         year = now.year
         month = now.month
         day = now.day
+
+    return (year,month,day)
+
+
+def scrape_highest(event, context):
+    '''
+    b = event.get("body")
+    if b is not None:
+        yy = json.loads(event["body"])
+
+        year = yy["year"]
+        month = yy["month"]
+        day = yy["day"]
+    else:
+        now = date.today()
+
+        year = now.year
+        month = now.month
+        day = now.day
+    '''
+
+    year,month,day = get_date_to_scrape(event)
 
     '''
     # ファイル名
@@ -241,7 +263,8 @@ def scrape_highest(event, context):
 
 def scrape_lowest(event, context):
     
-    now = date.today()
+    # now = date.today()
+    year,month,day = get_date_to_scrape(event)
 
     '''
     # ファイル名
@@ -252,7 +275,10 @@ def scrape_lowest(event, context):
 
     ret = scrape_lowest_temperature(s3_full_fn_utf8,fn_utf8)
     '''
-    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'lowest')
+    s3_full,s3_fn = get_s3_file(year,month,day,'lowest')
+
+    logger.info(s3_full)
+
     ret = scrape_lowest_temperature(s3_full,s3_fn)
 
     body = {
@@ -276,7 +302,8 @@ def scrape_lowest(event, context):
 
 def scrape_sn(event, context):
     
-    now = date.today()
+    # now = date.today()
+    year,month,day = get_date_to_scrape(event)
 
     '''
     # ファイル名
@@ -287,7 +314,10 @@ def scrape_sn(event, context):
 
     ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
     '''
-    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'snow')
+    s3_full,s3_fn = get_s3_file(year,month,day,'snow')
+
+    logger.info(s3_full)
+
     ret = scrape_snow(s3_full,s3_fn)
     
     body = {
@@ -312,7 +342,8 @@ def scrape_sn(event, context):
 
 def scrape_rain(event, context):
     
-    now = date.today()
+    # now = date.today()
+    year,month,day = get_date_to_scrape(event)
 
     '''
     # ファイル名
@@ -323,7 +354,10 @@ def scrape_rain(event, context):
 
     ret = scrape_rain24h(s3_full_fn_utf8,fn_utf8)
     '''
-    s3_full,s3_fn = get_s3_file(now.year,now.month,now.day,'rain24h')
+    s3_full,s3_fn = get_s3_file(year,month,day,'rain24h')
+
+    logger.info(s3_full)
+
     ret = scrape_rain24h(s3_full,s3_fn)
     
     body = {
@@ -593,7 +627,7 @@ def download_csv_upload_to_s3(download_url,attr):
     s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
     s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
-    s3.upload_file(full_fn, BUCKET_NAME, s3_full_fn)
+    # s3.upload_file(full_fn, BUCKET_NAME, s3_full_fn)
 
     convert_sjis_to_utf8_2(full_fn,full_fn_utf8)
 
