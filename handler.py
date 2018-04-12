@@ -3,7 +3,7 @@ import json
 import urllib.request
 import csv
 # from bs4 import BeautifulSoup
-from datetime import date
+from datetime import date,datetime,timedelta,timezone
 import os
 import logging
 import datetime
@@ -39,8 +39,22 @@ url_snow = "http://www.data.jma.go.jp/obd/stats/data/mdrr/snc_rct/alltable/snc00
 
 def hello(event, context):
     
-    download_csv_upload_to_s3( url_highest,'highest')
-    download_csv_upload_to_s3( url_lowest,'lowest')
+    now = date.today()
+    str1 = "{:04}{:02}{:02}".format(now.year,now.month,now.day)
+    logger.info('str1: '+str1)
+
+    now2 = datetime.datetime.now()
+    str2 = "{:04}{:02}{:02} {:02}:{:02}".format(now2.year,now2.month,now2.day,now2.hour,now2.minute)
+    logger.info('str2: '+str2)
+
+    JST = timezone(timedelta(hours=+9),'JST')
+
+    now3 = datetime.datetime.now(JST)
+    str3 = "{:04}{:02}{:02} {:02}:{:02}".format(now3.year,now3.month,now3.day,now3.hour,now3.minute)
+    logger.info('str3: '+str3)
+
+    # download_csv_upload_to_s3( url_highest,'highest')
+    # download_csv_upload_to_s3( url_lowest,'lowest')
 
     '''
     # URLにアクセスする
@@ -62,6 +76,9 @@ def hello(event, context):
     '''
 
     body = {
+        "str1": str1,
+        "str2": str2,
+        "str3": str3,
         # "message": "Go Serverless v1.0! Your function executed successfully!",
         # "filename": fn,
         "input": event
@@ -181,12 +198,12 @@ def download_rain24h(event, context):
 
 def get_s3_file(year,month,day,attr):
     # ファイル名
-    fn_utf8 = "{:04}{:02}{:02}_{}.csv".format(year,month,day,attr)
+    fn = "{:04}{:02}{:02}_{}.csv".format(year,month,day,attr)
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn_utf8 = "{}/{}/{}".format(year,month,fn_utf8)
+    s3_full_fn = "{}/{}/{}".format(year,month,fn)
 
-    return (s3_full_fn_utf8,fn_utf8)
+    return (s3_full_fn,fn)
     
 
 def get_date_to_scrape(event):
@@ -198,7 +215,11 @@ def get_date_to_scrape(event):
         month = yy["month"]
         day = yy["day"]
     else:
-        now = date.today()
+        # now = date.today()
+        JST = timezone(timedelta(hours=+9),'JST') # 日本時刻大切
+        now = datetime.datetime.now(JST)
+        str3 = "{:04}{:02}{:02} {:02}:{:02}".format(now.year,now.month,now.day,now.hour,now.minute)
+        logger.info('str3: '+str3)
 
         year = now.year
         month = now.month
@@ -559,46 +580,41 @@ def scrape_rain24h(s3_full_fn,fn):
     count=0
     with open(tempFile,newline='') as html:
         re = csv.reader(html,delimiter=',',quotechar='|')
-        for row in re:
-            if count>0:
-    	        #     県             地域             最高温度
-		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
-                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
-                # logger.info(str)
+        a = set()
+        with table.batch_writer() as batch:
+            for row in re:
+                if count>0:
 
-                place = row[2]
-                year = row[4]
-                month = row[5]  # csvファイルに0詰めで入っている
-                day = row[6]  # csvファイルに0詰めで入っている
-                date = "{}/{}/{}".format(year,month,day)
-                amount = row[11]
-                if amount:
-                    amount_val = Decimal(float(amount))
-                else:
-                    amount = '-'
-                    amount_val = Decimal(-999.0)
-                prefecture = row[1]
+                    place = row[2]
+                    year = row[4]
+                    month = row[5]  # csvファイルに0詰めで入っている
+                    day = row[6]  # csvファイルに0詰めで入っている
+                    date = "{}/{}/{}".format(year,month,day)
+                    amount = row[11]
+                    if amount:
+                        amount_val = Decimal(float(amount))
+                    else:
+                        amount = '-'
+                        amount_val = Decimal(-999.0)
+                    # prefecture = row[1]
 
-                place_no = row[0]
-                international_place_no = row[3]
-                if not international_place_no:
-                    international_place_no = '-'
-                time = "{}:{}".format(row[13],row[14])
+                    # place_no = row[0]
+                    # international_place_no = row[3]
+                    # if not international_place_no:
+                        # international_place_no = '-'
+                    time = "{}:{}".format(row[13],row[14])
 
-                table.put_item(
-                    Item={
-                        "place": place,
-                        "date": date,
-                        "rainfall_amount": amount,
-                        # "rainfall_amount_val": amount_val,
-                        # "prefecture": prefecture,
-
-                        # "place_no": place_no,
-                        # "international_place_no": international_place_no,
-                        "time": time
-                    }
-                )
-            count+=1
+                    if not place in a:
+                        batch.put_item(
+                            Item={
+                                "place": place,
+                                "date": date,
+                                "rainfall_amount": amount,
+                                "time": time
+                            }
+                        )
+                        a.add( place )
+                count+=1
 
     os.remove(tempFile)
 
@@ -609,11 +625,16 @@ def scrape_rain24h(s3_full_fn,fn):
 
 def download_csv_upload_to_s3(download_url,attr):
 
-    now = date.today()
+    #now = date.today()
+    JST = timezone(timedelta(hours=+9),'JST') # 日本時刻大切
+    now = datetime.datetime.now(JST)
+    str3 = "{:04}{:02}{:02} {:02}:{:02}".format(now.year,now.month,now.day,now.hour,now.minute)
+    logger.info('str3: '+str3)
 
     # ファイル名
     fn = now.strftime('%Y%m%d') + '_'+attr+'_sjis.csv'
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'.csv'
+    # fn_utf8 = now.strftime('%Y%m%d') + '_'+attr+'.csv'
+    s3_full_fn_utf8,fn_utf8 = get_s3_file(now.year,now.month,now.day,attr)
 
     # lambdaローカル保存用パス付きファイル名
     full_fn = '/tmp/' + fn
@@ -624,8 +645,8 @@ def download_csv_upload_to_s3(download_url,attr):
 #    html = urllib.request.urlopen(url)
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
-    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
+    # s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
+    #s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
 
     # s3.upload_file(full_fn, BUCKET_NAME, s3_full_fn)
 
