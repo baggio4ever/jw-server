@@ -53,34 +53,11 @@ def hello(event, context):
     str3 = "{:04}{:02}{:02} {:02}:{:02}".format(now3.year,now3.month,now3.day,now3.hour,now3.minute)
     logger.info('str3: '+str3)
 
-    # download_csv_upload_to_s3( url_highest,'highest')
-    # download_csv_upload_to_s3( url_lowest,'lowest')
-
-    '''
-    # URLにアクセスする
-    now = date.today()
-    fn = now.strftime('%Y%m%d') + '.csv'
-    fn_utf8 = now.strftime('%Y%m%d') + '_utf8.csv'
-    full_fn = '/tmp/' + fn
-    urllib.request.urlretrieve(url_highest,full_fn)
-#    html = urllib.request.urlopen(url)
-
-    s3.upload_file(full_fn, BUCKET_NAME, fn)
-
-    utf8_full_fn = convert_sjis_to_utf8(full_fn)
-
-    s3.upload_file(utf8_full_fn, BUCKET_NAME, fn_utf8)
-
-    os.remove(full_fn)
-    os.remove(utf8_full_fn)
-    '''
 
     body = {
         "str1": str1,
         "str2": str2,
         "str3": str3,
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
-        # "filename": fn,
         "input": event
     }
 
@@ -108,11 +85,8 @@ def hello(event, context):
 def download_highest_temperature(event, context):
     
     s3filename = download_csv_upload_to_s3( url_highest,'highest')
-    # ret = scrape_highest_temperature(s3filename)
 
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
-        # "ret":"gj",
         "input": event
     }
 
@@ -134,7 +108,6 @@ def download_lowest_temperature(event, context):
     s3filename = download_csv_upload_to_s3( url_lowest,'lowest')
 
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -156,7 +129,6 @@ def download_snow(event, context):
     s3filename = download_csv_upload_to_s3( url_snow,'snow')
 
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -178,7 +150,6 @@ def download_rain24h(event, context):
     s3filename = download_csv_upload_to_s3( url_rain24h,'rain24h')
 
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
     }
 
@@ -215,7 +186,6 @@ def get_date_to_scrape(event):
         month = yy["month"]
         day = yy["day"]
     else:
-        # now = date.today()
         JST = timezone(timedelta(hours=+9),'JST') # 日本時刻大切
         now = datetime.datetime.now(JST)
         str3 = "{:04}{:02}{:02} {:02}:{:02}".format(now.year,now.month,now.day,now.hour,now.minute)
@@ -229,21 +199,6 @@ def get_date_to_scrape(event):
 
 
 def scrape_highest(event, context):
-    '''
-    b = event.get("body")
-    if b is not None:
-        yy = json.loads(event["body"])
-
-        year = yy["year"]
-        month = yy["month"]
-        day = yy["day"]
-    else:
-        now = date.today()
-
-        year = now.year
-        month = now.month
-        day = now.day
-    '''
 
     year,month,day = get_date_to_scrape(event)
 
@@ -263,7 +218,6 @@ def scrape_highest(event, context):
     ret = scrape_highest_temperature(s3_full,s3_fn)
     
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -284,7 +238,6 @@ def scrape_highest(event, context):
 
 def scrape_lowest(event, context):
     
-    # now = date.today()
     year,month,day = get_date_to_scrape(event)
 
     '''
@@ -303,7 +256,6 @@ def scrape_lowest(event, context):
     ret = scrape_lowest_temperature(s3_full,s3_fn)
 
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -323,7 +275,6 @@ def scrape_lowest(event, context):
 
 def scrape_sn(event, context):
     
-    # now = date.today()
     year,month,day = get_date_to_scrape(event)
 
     '''
@@ -342,7 +293,6 @@ def scrape_sn(event, context):
     ret = scrape_snow(s3_full,s3_fn)
     
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -363,7 +313,6 @@ def scrape_sn(event, context):
 
 def scrape_rain(event, context):
     
-    # now = date.today()
     year,month,day = get_date_to_scrape(event)
 
     '''
@@ -382,7 +331,6 @@ def scrape_rain(event, context):
     ret = scrape_rain24h(s3_full,s3_fn)
     
     body = {
-        # "message": "Go Serverless v1.0! Your function executed successfully!",
         "ret":ret,
         "input": event
     }
@@ -442,11 +390,6 @@ def scrape_highest_temperature(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        # "temperature_val": temperature_val,
-                        # "prefecture": prefecture,
-
-                        # "place_no": place_no,
-                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -498,11 +441,6 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "temperature": temperature,
-                        # "temperature_val": temperature_val,
-                        # "prefecture": prefecture,
-
-                        # "place_no": place_no,
-                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -554,11 +492,6 @@ def scrape_snow(s3_full_fn,fn):
                         "place": place,
                         "date": date,
                         "snow_depth": depth,
-                        # "snow_depth_val": depth_val,
-                        # "prefecture": prefecture,
-
-                        # "place_no": place_no,
-                        # "international_place_no": international_place_no,
                         "time": time
                     }
                 )
@@ -642,7 +575,6 @@ def download_csv_upload_to_s3(download_url,attr):
 
     # URLにアクセスしてファイルに保存
     urllib.request.urlretrieve(download_url,full_fn)
-#    html = urllib.request.urlopen(url)
 
     # S3保存用パス付きファイル名 年/月のフォルダを作る
     # s3_full_fn = "{}/{}/{}".format(now.year,now.month,fn)
@@ -659,24 +591,6 @@ def download_csv_upload_to_s3(download_url,attr):
 
     return s3_full_fn_utf8
 
-'''
-def convert_sjis_to_utf8(fn):
-    # Shift_JIS ファイルのパス
-    shiftjis_csv_path = fn
-    # UTF-8 ファイルのパス
-    ftitle, fext = os.path.splitext(fn)
-#    os.rename(f, ftitle + '_img' + fext)    
-    utf8_csv_path = ftitle + '_utf8' + fext
-
-    # 文字コードを utf-8 に変換して保存
-    fin = codecs.open(shiftjis_csv_path, "r", "shift_jis")
-    fout_utf = codecs.open(utf8_csv_path, "w", "utf-8")
-    for row in fin:
-        fout_utf.write(row)
-    fin.close()
-    fout_utf.close()
-    return utf8_csv_path
-'''
 
 def convert_sjis_to_utf8_2(fn,fn_utf8):
     # Shift_JIS ファイルのパス
