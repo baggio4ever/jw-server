@@ -425,41 +425,45 @@ def scrape_snow(s3_full_fn,fn):
     count=0
     with open(tempFile,newline='') as html:
         re = csv.reader(html,delimiter=',',quotechar='|')
-        for row in re:
-            if count>0:
-    	        #     県             地域             最高温度
-		        #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
-                # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
-                # logger.info(str)
+        a = set()
+        with table.batch_writer() as batch:
+            for row in re:
+                if count>0:
+                    #     県             地域             最高温度
+                    #	print(row[1] + ' ' + row[2] + ' : ' + row[9])
+                    # str = '{:20}{:12} : {:6}'.format(row[1],row[2],row[9])
+                    # logger.info(str)
 
-                place = row[2]
-                year = row[4]
-                month = row[5]  # csvファイルに0詰めで入っている
-                day = row[6]  # csvファイルに0詰めで入っている
-                date = "{}/{}/{}".format(year,month,day)
-                depth = row[9]
-                if depth:
-                    depth_val = Decimal(float(depth))
-                else:
-                    depth = '-'
-                    depth_val = Decimal(-999.0)
-                # prefecture = row[1]
+                    place = row[2]
+                    year = row[4]
+                    month = row[5]  # csvファイルに0詰めで入っている
+                    day = row[6]  # csvファイルに0詰めで入っている
+                    date = "{}/{}/{}".format(year,month,day)
+                    depth = row[9]
+                    if depth:
+                        depth_val = Decimal(float(depth))
+                    else:
+                        depth = '-'
+                        depth_val = Decimal(-999.0)
+                    # prefecture = row[1]
 
-                # place_no = row[0]
-                # international_place_no = row[3]
-                # if not international_place_no:
-                    # international_place_no = '-'
-                time = "{}:{}".format(row[7],row[8])
+                    # place_no = row[0]
+                    # international_place_no = row[3]
+                    # if not international_place_no:
+                        # international_place_no = '-'
+                    time = "{}:{}".format(row[7],row[8])
 
-                table.put_item(
-                    Item={
-                        "place": place,
-                        "date": date,
-                        "snow_depth": depth,
-                        "time": time
-                    }
-                )
-            count+=1
+                    if not place in a:
+                        batch.put_item(
+                            Item={
+                                "place": place,
+                                "date": date,
+                                "snow_depth": depth,
+                                "time": time
+                            }
+                        )
+                        a.add( place )
+                count+=1
 
     os.remove(tempFile)
 
