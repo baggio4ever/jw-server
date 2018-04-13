@@ -202,15 +202,6 @@ def scrape_highest(event, context):
 
     year,month,day = get_date_to_scrape(event)
 
-    '''
-    # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'highest'+'.csv'
-
-    # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
-
-    ret = scrape_highest_temperature(s3_full_fn_utf8,fn_utf8)
-    '''
     s3_full,s3_fn = get_s3_file(year,month,day,'highest')
 
     logger.info(s3_full)
@@ -240,15 +231,6 @@ def scrape_lowest(event, context):
     
     year,month,day = get_date_to_scrape(event)
 
-    '''
-    # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'lowest'+'.csv'
-
-    # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
-
-    ret = scrape_lowest_temperature(s3_full_fn_utf8,fn_utf8)
-    '''
     s3_full,s3_fn = get_s3_file(year,month,day,'lowest')
 
     logger.info(s3_full)
@@ -277,15 +259,6 @@ def scrape_sn(event, context):
     
     year,month,day = get_date_to_scrape(event)
 
-    '''
-    # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'snow'+'.csv'
-
-    # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
-
-    ret = scrape_snow(s3_full_fn_utf8,fn_utf8)
-    '''
     s3_full,s3_fn = get_s3_file(year,month,day,'snow')
 
     logger.info(s3_full)
@@ -315,15 +288,6 @@ def scrape_rain(event, context):
     
     year,month,day = get_date_to_scrape(event)
 
-    '''
-    # ファイル名
-    fn_utf8 = now.strftime('%Y%m%d') + '_'+'rain24h'+'.csv'
-
-    # S3保存用パス付きファイル名 年/月のフォルダを作る
-    s3_full_fn_utf8 = "{}/{}/{}".format(now.year,now.month,fn_utf8)
-
-    ret = scrape_rain24h(s3_full_fn_utf8,fn_utf8)
-    '''
     s3_full,s3_fn = get_s3_file(year,month,day,'rain24h')
 
     logger.info(s3_full)
@@ -377,12 +341,12 @@ def scrape_highest_temperature(s3_full_fn,fn):
                 else:
                     temperature = '-'
                     temperature_val = Decimal(-999.0)
-                prefecture = row[1]
+                # prefecture = row[1]
 
-                place_no = row[0]
-                international_place_no = row[3]
-                if not international_place_no:
-                    international_place_no = '-'
+                # place_no = row[0]
+                # international_place_no = row[3]
+                # if not international_place_no:
+                    # international_place_no = '-'
                 time = "{}:{}".format(row[11],row[12])
 
                 table.put_item(
@@ -428,12 +392,12 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                 else:
                     temperature = '-'
                     temperature_val = Decimal( -999.0 )
-                prefecture = row[1]
+                # prefecture = row[1]
 
-                place_no = row[0]
-                international_place_no = row[3]
-                if not international_place_no:
-                    international_place_no = '-'
+                # place_no = row[0]
+                # international_place_no = row[3]
+                # if not international_place_no:
+                    # international_place_no = '-'
                 time = "{}:{}".format(row[11],row[12])
 
                 table.put_item(
@@ -479,12 +443,12 @@ def scrape_snow(s3_full_fn,fn):
                 else:
                     depth = '-'
                     depth_val = Decimal(-999.0)
-                prefecture = row[1]
+                # prefecture = row[1]
 
-                place_no = row[0]
-                international_place_no = row[3]
-                if not international_place_no:
-                    international_place_no = '-'
+                # place_no = row[0]
+                # international_place_no = row[3]
+                # if not international_place_no:
+                    # international_place_no = '-'
                 time = "{}:{}".format(row[7],row[8])
 
                 table.put_item(
