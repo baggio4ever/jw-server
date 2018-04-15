@@ -4,6 +4,9 @@ from datetime import date
 import boto3
 from time import sleep
 
+# 気象庁のサイトからダウンロードしたAMeDAS一覧のCSVファイルをUTF-8に変換する
+# それをDynamoDBに登録する
+
 TABLE_NAME = 'dev-jw-observatory'
 
 dynamo = boto3.resource('dynamodb',region_name='ap-southeast-2')
@@ -16,7 +19,6 @@ with open(fn,newline='',encoding='utf-8') as html:
 	with table.batch_writer() as batch:
 		count = 0
 		a = set()
-		# l = []
 		for row in re:
 			if count>0:
 				#     場所           地域            住所
@@ -40,21 +42,11 @@ with open(fn,newline='',encoding='utf-8') as html:
 						})
 					a.add(row[3])
 
-				# if not row[0] in l:
-				#	l.append(row[0])
-
 			count += 1
 
-		# DynamoDB にはチビチビ登録。
-		# if count % 10 == 0:
-		#	sleep(1)
 
 print('-----')
 print('読み取り行数: {}'.format(count))
-# print( a )
-# print( len(a) )
-# print( l )
-# print( len(l) )
 
 # http://minus9d.hatenablog.com/entry/2015/07/07/225304
 
