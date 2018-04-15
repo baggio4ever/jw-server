@@ -275,6 +275,10 @@ resources:
           -
             AttributeName: date
             AttributeType: S
+          -
+            AttributeName: rainfall_amount
+            AttributeType: S
+            
         KeySchema:
           -
             AttributeName: place
@@ -282,6 +286,21 @@ resources:
           -
             AttributeName: date
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: globalIndex1
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: rainfall_amount
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 1
+                WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 4
