@@ -65,5 +65,55 @@ def append_rainfall_amount_val(year,month,day):
 	else:
 		print('あれれ。Itemsないみたい')
 
+
+def append_highest_temperature_val(year,month,day):
+	TABLE_NAME = 'dev-jw-highest'
+	table = dynamo.Table(TABLE_NAME)
+	d = "{:04}/{:02}/{:02}".format(year,month,day)
+
+	print('---')
+	print('d : '+d)
+
+	response = table.query(
+		IndexName='globalIndex1',
+	    KeyConditionExpression=Key('date').eq(d)
+	)
+
+	c0 = 0
+	c1 = 0
+	if response.get('Items'):
+		for i in response['Items']:
+			if i.get('prefecture'):
+				i.pop('prefecture')
+			if i.get('place_no'):
+				i.pop('place_no')
+			if i.get('international_place_no'):
+				i.pop('international_place_no')
+			
+			print(i['date'], ":", i['temperature'])
+			if i['temperature']=='-':
+				i['temperature_val'] = decimal.Decimal("-999.9")
+				c0 += 1
+			else:
+				i['temperature_val'] = decimal.Decimal(i['temperature'])
+				c1 += 1
+		
+		print('len(response["Items"] : {}'.format(len(response['Items'])))
+		print( 'c0: {}, c1: {}'.format(c0,c1) )
+
+		print('response :' + json.dumps(response, cls=DecimalEncoder))
+
+		with table.batch_writer() as batch:
+			for i in response['Items']:
+				batch.put_item(
+						Item=i
+				)
+
+	else:
+		print('あれれ。Itemsないみたい')
+
+
 # append_rainfall_amount_val(2018,4,8)
-append_rainfall_amount_val(2018,4,9)
+# append_rainfall_amount_val(2018,4,9)
+# append_rainfall_amount_val(2018,4,10)
+append_rainfall_amount_val(2018,4,11)
