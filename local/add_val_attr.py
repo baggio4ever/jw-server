@@ -65,4 +65,5 @@ def append_rainfall_amount_val(year,month,day):
 	else:
 		print('あれれ。Itemsないみたい')
 
-append_rainfall_amount_val(2018,4,8)
+# append_rainfall_amount_val(2018,4,8)
+append_rainfall_amount_val(2018,4,9)

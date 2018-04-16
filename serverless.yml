@@ -81,37 +81,37 @@ functions:
     handler: handler.download_highest_temperature
     timeout: 10
     events:
-      # 日本時間で 23:45 のつもり
-      - schedule: cron(45 14 * * ? *)
+      # 日本時間で 23:30 のつもり
+      - schedule: cron(30 14 * * ? *)
 
   download_lowest_temp:
     handler: handler.download_lowest_temperature
     timeout: 10
     events:
-      # 日本時間で 23:47 のつもり
-      - schedule: cron(47 14 * * ? *)
+      # 日本時間で 23:32 のつもり
+      - schedule: cron(32 14 * * ? *)
 
   download_snow:
     handler: handler.download_snow
     timeout: 10
     events:
-      # 日本時間で 23:49 のつもり
-      - schedule: cron(49 14 * * ? *)
+      # 日本時間で 23:34 のつもり
+      - schedule: cron(34 14 * * ? *)
 
   download_rain24h:
     handler: handler.download_rain24h
     timeout: 10
     events:
-      # 日本時間で 23:51 のつもり
-      - schedule: cron(51 14 * * ? *)
+      # 日本時間で 23:36 のつもり
+      - schedule: cron(36 14 * * ? *)
     
 
   scrape_highest:
     handler: handler.scrape_highest
-    timeout: 120
+    timeout: 180
     events:
-      # 日本時間で 23:52 のつもり
-      - schedule: cron(52 14 * * ? *)
+      # 日本時間で 23:40 のつもり
+      - schedule: cron(40 14 * * ? *)
       - http:
           path: scrape_highest
           method: post
@@ -120,10 +120,10 @@ functions:
 
   scrape_lowest:
     handler: handler.scrape_lowest
-    timeout: 120
+    timeout: 180
     events:
-      # 日本時間で 23:53 のつもり
-      - schedule: cron(53 14 * * ? *)
+      # 日本時間で 23:43 のつもり
+      - schedule: cron(43 14 * * ? *)
       - http:
           path: scrape_lowest
           method: post
@@ -132,10 +132,10 @@ functions:
 
   scrape_snow:
     handler: handler.scrape_sn
-    timeout: 120
+    timeout: 180
     events:
-      # 日本時間で 23:54 のつもり
-      - schedule: cron(54 14 * * ? *)
+      # 日本時間で 23:46 のつもり
+      - schedule: cron(46 14 * * ? *)
       - http:
           path: scrape_snow
           method: post
@@ -144,10 +144,10 @@ functions:
 
   scrape_rain24h:
     handler: handler.scrape_rain
-    timeout: 120
+    timeout: 240
     events:
-      # 日本時間で 23:55 のつもり
-      - schedule: cron(55 14 * * ? *)
+      # 日本時間で 23:49 のつもり
+      - schedule: cron(49 14 * * ? *)
       - http:
           path: scrape_rain24h
           method: post
@@ -214,8 +214,8 @@ resources:
             AttributeName: date
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 4
+          ReadCapacityUnits: 15
+          WriteCapacityUnits: 15
         TableName: "${self:provider.stage}-jw-highest"
 
     jwLowestDynamoDbTable:
@@ -237,8 +237,8 @@ resources:
             AttributeName: date
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 4
+          ReadCapacityUnits: 15
+          WriteCapacityUnits: 15
         TableName: "${self:provider.stage}-jw-lowest"
 
     jwSnowDynamoDbTable:
@@ -260,8 +260,8 @@ resources:
             AttributeName: date
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 4
+          ReadCapacityUnits: 15
+          WriteCapacityUnits: 15
         TableName: "${self:provider.stage}-jw-snow"
 
     jwRain24hDynamoDbTable:
@@ -299,8 +299,8 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 1
-                WriteCapacityUnits: 1
+                ReadCapacityUnits: 15
+                WriteCapacityUnits: 15
         ProvisionedThroughput:
           ReadCapacityUnits: 15
           WriteCapacityUnits: 15
