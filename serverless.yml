@@ -206,6 +206,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
+          -
+            AttributeName: temperature
+            AttributeType: S
         KeySchema:
           -
             AttributeName: place
@@ -213,6 +216,21 @@ resources:
           -
             AttributeName: date
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: globalIndex1
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: temperature
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 15
+                WriteCapacityUnits: 15
         ProvisionedThroughput:
           ReadCapacityUnits: 15
           WriteCapacityUnits: 15
@@ -229,6 +247,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
+          -
+            AttributeName: temperature
+            AttributeType: S
         KeySchema:
           -
             AttributeName: place
@@ -236,6 +257,21 @@ resources:
           -
             AttributeName: date
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: globalIndex1
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: temperature
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 15
+                WriteCapacityUnits: 15
         ProvisionedThroughput:
           ReadCapacityUnits: 15
           WriteCapacityUnits: 15
@@ -252,6 +288,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
+          -
+            AttributeName: snow_depth
+            AttributeType: S
         KeySchema:
           -
             AttributeName: place
@@ -259,6 +298,21 @@ resources:
           -
             AttributeName: date
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          -
+            IndexName: globalIndex1
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: snow_depth
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 15
+                WriteCapacityUnits: 15
         ProvisionedThroughput:
           ReadCapacityUnits: 15
           WriteCapacityUnits: 15
@@ -278,6 +332,9 @@ resources:
           -
             AttributeName: rainfall_amount
             AttributeType: S
+          -
+            AttributeName: rainfall_amount_val
+            AttributeType: N
             
         KeySchema:
           -
@@ -295,6 +352,20 @@ resources:
                 KeyType: HASH
               -
                 AttributeName: rainfall_amount
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 15
+                WriteCapacityUnits: 15
+          -
+            IndexName: globalIndex2
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: rainfall_amount_val
                 KeyType: RANGE
             Projection:
                 ProjectionType: ALL
