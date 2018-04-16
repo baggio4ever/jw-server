@@ -10,7 +10,7 @@ import datetime
 import base64
 import codecs
 import boto3
-from decimal import Decimal
+import decimal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -35,6 +35,14 @@ url_rain24h = "http://www.data.jma.go.jp/obd/stats/data/mdrr/pre_rct/alltable/pr
 
 # 積雪量
 url_snow = "http://www.data.jma.go.jp/obd/stats/data/mdrr/snc_rct/alltable/snc00_rct.csv"
+
+
+# Helper class to convert a DynamoDB item to JSON.
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return str(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def hello(event, context):
@@ -215,7 +223,7 @@ def scrape_highest(event, context):
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body),
+        "body": json.dumps(body, cls=DecimalEncoder),
         "headers": {
             "Access-Control-Allow-Origin":"*"
         }
@@ -244,7 +252,7 @@ def scrape_lowest(event, context):
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body),
+        "body": json.dumps(body, cls=DecimalEncoder),
         "headers": {
             "Access-Control-Allow-Origin":"*"
         }
@@ -272,7 +280,7 @@ def scrape_sn(event, context):
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body),
+        "body": json.dumps(body, cls=DecimalEncoder),
         "headers": {
             "Access-Control-Allow-Origin":"*"
         }
@@ -301,7 +309,7 @@ def scrape_rain(event, context):
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body),
+        "body": json.dumps(body, cls=DecimalEncoder),
         "headers": {
             "Access-Control-Allow-Origin":"*"
         }
@@ -339,10 +347,10 @@ def scrape_highest_temperature(s3_full_fn,fn):
                     date = "{}/{}/{}".format(year,month,day)
                     temperature = row[9]
                     if temperature:
-                        temperature_val = Decimal(float(temperature))
+                        temperature_val = decimal.Decimal(temperature)
                     else:
                         temperature = '-'
-                        temperature_val = Decimal(-999.0)
+                        temperature_val = decimal.Decimal("-999.9")
                     # prefecture = row[1]
 
                     # place_no = row[0]
@@ -357,6 +365,7 @@ def scrape_highest_temperature(s3_full_fn,fn):
                                 "place": place,
                                 "date": date,
                                 "temperature": temperature,
+                                "temperature_val": temperature_val,
                                 "time": time
                             }
                         )
@@ -394,10 +403,10 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                     date = "{}/{}/{}".format(year,month,day)
                     temperature = row[9]
                     if temperature:
-                        temperature_val = Decimal( float(temperature) )
+                        temperature_val = decimal.Decimal( temperature )
                     else:
                         temperature = '-'
-                        temperature_val = Decimal( -999.0 )
+                        temperature_val = decimal.Decimal( "999.9" )
                     # prefecture = row[1]
 
                     # place_no = row[0]
@@ -412,6 +421,7 @@ def scrape_lowest_temperature(s3_full_fn,fn):
                                 "place": place,
                                 "date": date,
                                 "temperature": temperature,
+                                "temperature_val": temperature_val,
                                 "time": time
                             }
                         )
@@ -449,10 +459,10 @@ def scrape_snow(s3_full_fn,fn):
                     date = "{}/{}/{}".format(year,month,day)
                     depth = row[9]
                     if depth:
-                        depth_val = Decimal(float(depth))
+                        depth_val = decimal.Decimal(depth)
                     else:
                         depth = '-'
-                        depth_val = Decimal(-999.0)
+                        depth_val = decimal.Decimal("-999.9")
                     # prefecture = row[1]
 
                     # place_no = row[0]
@@ -467,6 +477,7 @@ def scrape_snow(s3_full_fn,fn):
                                 "place": place,
                                 "date": date,
                                 "snow_depth": depth,
+                                "snow_depth_val": depth_val,
                                 "time": time
                             }
                         )
@@ -501,10 +512,10 @@ def scrape_rain24h(s3_full_fn,fn):
                     date = "{}/{}/{}".format(year,month,day)
                     amount = row[11]
                     if amount:
-                        amount_val = Decimal(float(amount))
+                        amount_val = decimal.Decimal(amount)
                     else:
                         amount = '-'
-                        amount_val = Decimal(-999.0)
+                        amount_val = decimal.Decimal("-999.9")
                     # prefecture = row[1]
 
                     # place_no = row[0]
@@ -519,6 +530,7 @@ def scrape_rain24h(s3_full_fn,fn):
                                 "place": place,
                                 "date": date,
                                 "rainfall_amount": amount,
+                                "rainfall_amount_val": amount_val,
                                 "time": time
                             }
                         )
