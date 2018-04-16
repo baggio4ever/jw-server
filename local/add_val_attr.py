@@ -116,4 +116,6 @@ def append_highest_temperature_val(year,month,day):
 # append_rainfall_amount_val(2018,4,8)
 # append_rainfall_amount_val(2018,4,9)
 # append_rainfall_amount_val(2018,4,10)
-append_rainfall_amount_val(2018,4,11)
+# append_rainfall_amount_val(2018,4,11)
+# append_rainfall_amount_val(2018,4,12)
+append_rainfall_amount_val(2018,4,13)
