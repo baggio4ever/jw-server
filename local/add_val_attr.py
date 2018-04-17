@@ -8,6 +8,7 @@ import json
 import decimal
 
 # 文字列として登録されている 気温や降水量、積雪量を数値属性で追加する
+# あわせて不要な属性（prefectureなど）を削除
 
 
 dynamo = boto3.resource('dynamodb',region_name='ap-southeast-2')
@@ -237,4 +238,10 @@ def append_snow_depth_val(year,month,day):
 
 # 最低気温
 # append_lowest_temperature_val(2018,4,7)
-append_lowest_temperature_val(2018,4,8)
+# append_lowest_temperature_val(2018,4,8)
+# append_lowest_temperature_val(2018,4,9)
+# append_lowest_temperature_val(2018,4,10)
+# append_lowest_temperature_val(2018,4,11)
+# append_lowest_temperature_val(2018,4,12)
+append_lowest_temperature_val(2018,4,13)
+
