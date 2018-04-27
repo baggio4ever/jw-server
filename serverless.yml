@@ -229,11 +229,11 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 15
-                WriteCapacityUnits: 15
+                ReadCapacityUnits: 10
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 15
-          WriteCapacityUnits: 15
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-highest"
 
     jwLowestDynamoDbTable:
@@ -270,11 +270,11 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 15
-                WriteCapacityUnits: 15
+                ReadCapacityUnits: 10
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 15
-          WriteCapacityUnits: 15
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-lowest"
 
     jwSnowDynamoDbTable:
@@ -311,11 +311,11 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 15
-                WriteCapacityUnits: 15
+                ReadCapacityUnits: 10
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 15
-          WriteCapacityUnits: 15
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-snow"
 
     jwRain24hDynamoDbTable:
@@ -391,7 +391,7 @@ resources:
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
-          WriteCapacityUnits: 4
+          WriteCapacityUnits: 3
         TableName: "${self:provider.stage}-jw-observatory"
 
   Outputs:
