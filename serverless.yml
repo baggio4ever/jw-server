@@ -219,9 +219,9 @@ resources:
           -
             AttributeName: temperature
             AttributeType: S
-#          -
-#            AttributeName: temperature_val
-#            AttributeType: N
+          -
+            AttributeName: temperature_val
+            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -244,20 +244,20 @@ resources:
             ProvisionedThroughput:
                 ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
-#          -
-#            IndexName: globalIndex2
-#            KeySchema:
-#              -
-#                AttributeName: date
-#                KeyType: HASH
-#              -
-#                AttributeName: temperature_val
-#                KeyType: RANGE
-#            Projection:
-#                ProjectionType: ALL
-#            ProvisionedThroughput:
-#                ReadCapacityUnits: 5
-#                WriteCapacityUnits: 10
+          -
+            IndexName: globalIndex2
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: temperature_val
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 10
@@ -277,9 +277,9 @@ resources:
           -
             AttributeName: temperature
             AttributeType: S
-#          -
-#            AttributeName: temperature_val
-#            AttributeType: N
+          -
+            AttributeName: temperature_val
+            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -302,20 +302,20 @@ resources:
             ProvisionedThroughput:
                 ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
-#          -
-#            IndexName: globalIndex2
-#            KeySchema:
-#              -
-#                AttributeName: date
-#                KeyType: HASH
-#              -
-#                AttributeName: temperature_val
-#                KeyType: RANGE
-#            Projection:
-#                ProjectionType: ALL
-#            ProvisionedThroughput:
-#                ReadCapacityUnits: 5
-#                WriteCapacityUnits: 10
+          -
+            IndexName: globalIndex2
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: temperature_val
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 10
@@ -335,9 +335,9 @@ resources:
           -
             AttributeName: snow_depth
             AttributeType: S
-#          -
-#            AttributeName: snow_depth_val
-#            AttributeType: N
+          -
+            AttributeName: snow_depth_val
+            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -360,20 +360,20 @@ resources:
             ProvisionedThroughput:
                 ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
-#          -
-#            IndexName: globalIndex2
-#            KeySchema:
-#              -
-#                AttributeName: date
-#                KeyType: HASH
-#              -
-#                AttributeName: snow_depth_val
-#                KeyType: RANGE
-#            Projection:
-#                ProjectionType: ALL
-#            ProvisionedThroughput:
-#                ReadCapacityUnits: 5
-#                WriteCapacityUnits: 10
+          -
+            IndexName: globalIndex2
+            KeySchema:
+              -
+                AttributeName: date
+                KeyType: HASH
+              -
+                AttributeName: snow_depth_val
+                KeyType: RANGE
+            Projection:
+                ProjectionType: ALL
+            ProvisionedThroughput:
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 10
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 10
