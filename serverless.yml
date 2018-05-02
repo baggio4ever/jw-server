@@ -112,11 +112,11 @@ functions:
     events:
       # 日本時間で 23:40 のつもり
       - schedule: cron(40 14 * * ? *)
-      - http:
-          path: scrape_highest
-          method: post
-          private: false # APIキーを使用する
-          cors: true  # API GatewayにCORSの設定をする
+#      - http:
+#          path: scrape_highest
+#          method: post
+#          private: false # APIキーを使用する
+#          cors: true  # API GatewayにCORSの設定をする
 
   scrape_lowest:
     handler: handler.scrape_lowest
@@ -124,11 +124,11 @@ functions:
     events:
       # 日本時間で 23:43 のつもり
       - schedule: cron(43 14 * * ? *)
-      - http:
-          path: scrape_lowest
-          method: post
-          private: false # APIキーを使用する
-          cors: true  # API GatewayにCORSの設定をする
+#      - http:
+#          path: scrape_lowest
+#          method: post
+#          private: false # APIキーを使用する
+#          cors: true  # API GatewayにCORSの設定をする
 
   scrape_snow:
     handler: handler.scrape_sn
@@ -136,11 +136,11 @@ functions:
     events:
       # 日本時間で 23:46 のつもり
       - schedule: cron(46 14 * * ? *)
-      - http:
-          path: scrape_snow
-          method: post
-          private: false # APIキーを使用する
-          cors: true  # API GatewayにCORSの設定をする
+#      - http:
+#          path: scrape_snow
+#          method: post
+#          private: false # APIキーを使用する
+#          cors: true  # API GatewayにCORSの設定をする
 
   scrape_rain24h:
     handler: handler.scrape_rain
@@ -148,11 +148,11 @@ functions:
     events:
       # 日本時間で 23:49 のつもり
       - schedule: cron(49 14 * * ? *)
-      - http:
-          path: scrape_rain24h
-          method: post
-          private: false # APIキーを使用する
-          cors: true  # API GatewayにCORSの設定をする
+#      - http:
+#          path: scrape_rain24h
+#          method: post
+#          private: false # APIキーを使用する
+#          cors: true  # API GatewayにCORSの設定をする
 
   get_highest_top:
     handler: handler2.get_highest_top
@@ -160,6 +160,16 @@ functions:
     events:
       - http:
           path: get_highest_top
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_lowest_top:
+    handler: handler2.get_lowest_top
+    timeout: 30
+    events:
+      - http:
+          path: get_lowest_top
           method: get
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
