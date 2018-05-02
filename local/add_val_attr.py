@@ -191,7 +191,7 @@ def append_snow_depth_val(year,month,day):
 			
 			print(i['date'], ":", i['snow_depth'])
 			if i['snow_depth']=='-':
-				i['snow_depth_val'] = decimal.Decimal("999.9")
+				i['snow_depth_val'] = decimal.Decimal("-999.9")
 				c0 += 1
 			else:
 				i['snow_depth_val'] = decimal.Decimal(i['snow_depth'])
