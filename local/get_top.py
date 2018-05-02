@@ -36,7 +36,7 @@ def get_highest_top(year,month,day):
     )
 
     if response.get('Items'):
-        print('len(response["Items"] : {}'.format(len(response['Items'])))
+#        print('len(response["Items"] : {}'.format(len(response['Items'])))
         for i in response['Items']:
             print(i['place'] + ' : ' + str(i['temperature_val']))
 
@@ -62,7 +62,7 @@ def get_lowest_top(year,month,day):
     )
 
     if response.get('Items'):
-        print('len(response["Items"] : {}'.format(len(response['Items'])))
+#        print('len(response["Items"] : {}'.format(len(response['Items'])))
         for i in response['Items']:
             print(i['place'] + ' : ' + str(i['temperature_val']))
 
@@ -88,7 +88,7 @@ def get_rainfall_top(year,month,day):
     )
 
     if response.get('Items'):
-        print('len(response["Items"] : {}'.format(len(response['Items'])))
+#        print('len(response["Items"] : {}'.format(len(response['Items'])))
         for i in response['Items']:
             print(i['place'] + ' : ' + str(i['rainfall_amount_val']))
 
@@ -114,7 +114,7 @@ def get_snow_depth_top(year,month,day):
     )
 
     if response.get('Items'):
-        print('len(response["Items"] : {}'.format(len(response['Items'])))
+#        print('len(response["Items"] : {}'.format(len(response['Items'])))
         for i in response['Items']:
             print(i['place'] + ' : ' + str(i['snow_depth_val']))
 
@@ -123,7 +123,12 @@ def get_snow_depth_top(year,month,day):
         print('あれれ。Itemsないみたい')
 
 
+
 # 降水量トップn
 # get_rainfall_top(2018,4,14)
 
 get_snow_depth_top(2018,4,14)
+
+get_highest_top(2018,4,14)
+
+get_lowest_top(2018,4,14)
