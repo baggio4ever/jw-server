@@ -243,5 +243,19 @@ def append_snow_depth_val(year,month,day):
 # append_lowest_temperature_val(2018,4,10)
 # append_lowest_temperature_val(2018,4,11)
 # append_lowest_temperature_val(2018,4,12)
-append_lowest_temperature_val(2018,4,13)
+# append_lowest_temperature_val(2018,4,13)
+# append_lowest_temperature_val(2018,4,14)
+# append_lowest_temperature_val(2018,4,15)
+# lowest 完了
 
+# 積雪量
+# append_snow_depth_val(2018,4,7)
+# append_snow_depth_val(2018,4,8)
+# append_snow_depth_val(2018,4,9)
+# append_snow_depth_val(2018,4,10)
+# append_snow_depth_val(2018,4,11)
+# append_snow_depth_val(2018,4,12)
+# append_snow_depth_val(2018,4,13)
+# append_snow_depth_val(2018,4,14)
+# append_snow_depth_val(2018,4,15)
+# snow 完了
