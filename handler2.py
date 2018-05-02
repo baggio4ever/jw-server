@@ -2,7 +2,6 @@
 import json
 import urllib.request
 import csv
-# from bs4 import BeautifulSoup
 from datetime import date,datetime,timedelta,timezone
 import os
 import logging
@@ -263,6 +262,8 @@ def get_snow_top(event, context):
 
     return response
 
+
+# name : 取得したい観測ポイント名（記述ない時は、空を返す）
 
 def get_observatory(event, context):
     TABLE_NAME = 'dev-jw-observatory'

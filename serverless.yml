@@ -204,6 +204,16 @@ functions:
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
 
+  get_highest_range:
+    handler: handler3.get_highest_range
+    timeout: 30
+    events:
+      - http:
+          path: highest_range
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
