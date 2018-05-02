@@ -31,13 +31,13 @@ class DecimalEncoder(json.JSONEncoder):
 
 DEFAULT_TOP = 10
 
-def getToday():
+def get_today():
     JST = timezone(timedelta(hours=+9),'JST') # 日本時刻大切
     now = datetime.datetime.now(JST)
     return now
     
-def getYesterday():
-    today = getToday()
+def get_yesterday():
+    today = get_today()
     t = timedelta(days=1)
     return (today-t)
 
@@ -59,7 +59,7 @@ def get_highest_top(event, context):
         if dd is not None:
             d = dd
         else:
-            d = format_date2( getYesterday() )
+            d = format_date2( get_yesterday() )
 
         ttop = params.get('top')
         if ttop is not None:
@@ -67,7 +67,7 @@ def get_highest_top(event, context):
         else:
             top = DEFAULT_TOP
     else:
-        d = format_date2(getYesterday())
+        d = format_date2(get_yesterday())
         top = DEFAULT_TOP
     
     logger.info('-- 最高気温 --')
@@ -85,7 +85,7 @@ def get_highest_top(event, context):
 
 
     body = {
-        "result": response['Items']
+        "Items": response['Items']
 #        "input": event
     }
 
@@ -113,7 +113,7 @@ def get_lowest_top(event, context):
         if dd is not None:
             d = dd
         else:
-            d = format_date2( getYesterday() )
+            d = format_date2( get_yesterday() )
 
         ttop = params.get('top')
         if ttop is not None:
@@ -121,7 +121,7 @@ def get_lowest_top(event, context):
         else:
             top = DEFAULT_TOP
     else:
-        d = format_date2(getYesterday())
+        d = format_date2(get_yesterday())
         top = DEFAULT_TOP
     
     logger.info('-- 最低気温 --')
@@ -139,7 +139,157 @@ def get_lowest_top(event, context):
 
 
     body = {
-        "result": response['Items']
+        "Items": response['Items']
+#        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body, cls=DecimalEncoder),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def get_rain24h_top(event, context):
+    TABLE_NAME = 'dev-jw-rain24h'
+    table = dynamo.Table(TABLE_NAME)
+
+    if( event.get('queryStringParameters')):
+        params = event.get('queryStringParameters')
+
+        dd = params.get('date')
+        if dd is not None:
+            d = dd
+        else:
+            d = format_date2( get_yesterday() )
+
+        ttop = params.get('top')
+        if ttop is not None:
+            top = int(ttop)
+        else:
+            top = DEFAULT_TOP
+    else:
+        d = format_date2(get_yesterday())
+        top = DEFAULT_TOP
+    
+    logger.info('-- 降水量(24h) --')
+    logger.info('date : '+d)
+
+    response = table.query(
+        IndexName='globalIndex2',
+        KeyConditionExpression=Key('date').eq(d),
+        ScanIndexForward=False,  #昇順か降順か（デフォルトは True=昇順）
+        Limit=top
+    )
+
+    if len(response['Items']) == 0:
+        logger.info('あれれ。該当データないみたい')
+
+
+    body = {
+        "Items": response['Items']
+#        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body, cls=DecimalEncoder),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def get_snow_top(event, context):
+    TABLE_NAME = 'dev-jw-snow'
+    table = dynamo.Table(TABLE_NAME)
+
+    if( event.get('queryStringParameters')):
+        params = event.get('queryStringParameters')
+
+        dd = params.get('date')
+        if dd is not None:
+            d = dd
+        else:
+            d = format_date2( get_yesterday() )
+
+        ttop = params.get('top')
+        if ttop is not None:
+            top = int(ttop)
+        else:
+            top = DEFAULT_TOP
+    else:
+        d = format_date2(get_yesterday())
+        top = DEFAULT_TOP
+    
+    logger.info('-- 積雪量 --')
+    logger.info('date : '+d)
+
+    response = table.query(
+        IndexName='globalIndex2',
+        KeyConditionExpression=Key('date').eq(d),
+        ScanIndexForward=False,  #昇順か降順か（デフォルトは True=昇順）
+        Limit=top
+    )
+
+    if len(response['Items']) == 0:
+        logger.info('あれれ。該当データないみたい')
+
+
+    body = {
+        "Items": response['Items']
+#        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body, cls=DecimalEncoder),
+        "headers": {
+            "Access-Control-Allow-Origin":"*"
+        }
+    }
+    
+    logger.info(response)
+
+    return response
+
+
+def get_observatory(event, context):
+    TABLE_NAME = 'dev-jw-observatory'
+    table = dynamo.Table(TABLE_NAME)
+
+    if( event.get('queryStringParameters')):
+        params = event.get('queryStringParameters')
+
+        name = params.get('name')
+        if name is not None:
+            logger.info('place : ' + name)
+
+            response = table.query(
+                KeyConditionExpression=Key('place').eq(name)
+            )
+            if len(response['Items']) == 0:
+                logger.info('あれれ。該当データないみたい')
+            
+            results = response['Items']
+
+        else:
+            results = []
+    else:
+        results = []
+
+    body = {
+        "Items": results
 #        "input": event
     }
 

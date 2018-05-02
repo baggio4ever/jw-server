@@ -159,7 +159,7 @@ functions:
     timeout: 30
     events:
       - http:
-          path: get_highest_top
+          path: highest_top
           method: get
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
@@ -169,7 +169,37 @@ functions:
     timeout: 30
     events:
       - http:
-          path: get_lowest_top
+          path: lowest_top
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_rain24h_top:
+    handler: handler2.get_rain24h_top
+    timeout: 30
+    events:
+      - http:
+          path: rain24h_top
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_snow_top:
+    handler: handler2.get_snow_top
+    timeout: 30
+    events:
+      - http:
+          path: snow_top
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_observatory:
+    handler: handler2.get_observatory
+    timeout: 30
+    events:
+      - http:
+          path: observatory
           method: get
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
