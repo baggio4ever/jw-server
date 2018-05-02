@@ -154,6 +154,16 @@ functions:
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
 
+  get_highest_top:
+    handler: handler.get_highest_top
+    timeout: 180
+    events:
+      - http:
+          path: get_highest_top
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -209,6 +219,9 @@ resources:
           -
             AttributeName: temperature
             AttributeType: S
+#          -
+#            AttributeName: temperature_val
+#            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -229,10 +242,24 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 10
+                ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex2
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: temperature_val
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-highest"
 
@@ -250,6 +277,9 @@ resources:
           -
             AttributeName: temperature
             AttributeType: S
+#          -
+#            AttributeName: temperature_val
+#            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -270,10 +300,24 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 10
+                ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex2
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: temperature_val
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-lowest"
 
@@ -291,6 +335,9 @@ resources:
           -
             AttributeName: snow_depth
             AttributeType: S
+#          -
+#            AttributeName: snow_depth_val
+#            AttributeType: N
         KeySchema:
           -
             AttributeName: place
@@ -311,10 +358,24 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 10
+                ReadCapacityUnits: 5
                 WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex2
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: snow_depth_val
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
         ProvisionedThroughput:
-          ReadCapacityUnits: 10
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 10
         TableName: "${self:provider.stage}-jw-snow"
 
@@ -370,10 +431,10 @@ resources:
             Projection:
                 ProjectionType: ALL
             ProvisionedThroughput:
-                ReadCapacityUnits: 15
+                ReadCapacityUnits: 5
                 WriteCapacityUnits: 15
         ProvisionedThroughput:
-          ReadCapacityUnits: 15
+          ReadCapacityUnits: 5
           WriteCapacityUnits: 15
         TableName: "${self:provider.stage}-jw-rain24h"
 
