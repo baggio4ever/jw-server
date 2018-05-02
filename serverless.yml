@@ -155,8 +155,8 @@ functions:
           cors: true  # API GatewayにCORSの設定をする
 
   get_highest_top:
-    handler: handler.get_highest_top
-    timeout: 180
+    handler: handler2.get_highest_top
+    timeout: 30
     events:
       - http:
           path: get_highest_top
@@ -216,9 +216,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
-          -
-            AttributeName: temperature
-            AttributeType: S
+#          -
+#            AttributeName: temperature
+#            AttributeType: S
           -
             AttributeName: temperature_val
             AttributeType: N
@@ -230,20 +230,20 @@ resources:
             AttributeName: date
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          -
-            IndexName: globalIndex1
-            KeySchema:
-              -
-                AttributeName: date
-                KeyType: HASH
-              -
-                AttributeName: temperature
-                KeyType: RANGE
-            Projection:
-                ProjectionType: ALL
-            ProvisionedThroughput:
-                ReadCapacityUnits: 5
-                WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex1
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: temperature
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
           -
             IndexName: globalIndex2
             KeySchema:
@@ -274,9 +274,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
-          -
-            AttributeName: temperature
-            AttributeType: S
+#          -
+#            AttributeName: temperature
+#            AttributeType: S
           -
             AttributeName: temperature_val
             AttributeType: N
@@ -288,20 +288,20 @@ resources:
             AttributeName: date
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          -
-            IndexName: globalIndex1
-            KeySchema:
-              -
-                AttributeName: date
-                KeyType: HASH
-              -
-                AttributeName: temperature
-                KeyType: RANGE
-            Projection:
-                ProjectionType: ALL
-            ProvisionedThroughput:
-                ReadCapacityUnits: 5
-                WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex1
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: temperature
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
           -
             IndexName: globalIndex2
             KeySchema:
@@ -332,9 +332,9 @@ resources:
           -
             AttributeName: date
             AttributeType: S
-          -
-            AttributeName: snow_depth
-            AttributeType: S
+#          -
+#            AttributeName: snow_depth
+#            AttributeType: S
           -
             AttributeName: snow_depth_val
             AttributeType: N
@@ -346,20 +346,20 @@ resources:
             AttributeName: date
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          -
-            IndexName: globalIndex1
-            KeySchema:
-              -
-                AttributeName: date
-                KeyType: HASH
-              -
-                AttributeName: snow_depth
-                KeyType: RANGE
-            Projection:
-                ProjectionType: ALL
-            ProvisionedThroughput:
-                ReadCapacityUnits: 5
-                WriteCapacityUnits: 10
+#          -
+#            IndexName: globalIndex1
+#            KeySchema:
+#              -
+#                AttributeName: date
+#                KeyType: HASH
+#              -
+#                AttributeName: snow_depth
+#                KeyType: RANGE
+#            Projection:
+#                ProjectionType: ALL
+#            ProvisionedThroughput:
+#                ReadCapacityUnits: 5
+#                WriteCapacityUnits: 10
           -
             IndexName: globalIndex2
             KeySchema:

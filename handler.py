@@ -291,18 +291,6 @@ def scrape_sn(event, context):
     return response
 
 
-def get_highest_top(event, context):
-    response = {
-        "statusCode": 200,
-        "body": "",
-        "headers": {
-            "Access-Control-Allow-Origin":"*"
-        }
-    }
-    
-    logger.info(response)
-
-    return response
 
 
 def scrape_rain(event, context):
