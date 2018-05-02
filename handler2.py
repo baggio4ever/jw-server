@@ -59,8 +59,6 @@ def get_highest_top(event, context):
         if dd is not None:
             d = dd
         else:
-            # now = getYesterday()
-            # d = "{:04}/{:02}/{:02}".format(now.year,now.month,now.day)
             d = format_date2( getYesterday() )
 
         ttop = params.get('top')
@@ -69,8 +67,6 @@ def get_highest_top(event, context):
         else:
             top = DEFAULT_TOP
     else:
-        # now = getYesterday()
-        # d = "{:04}/{:02}/{:02}".format(now.year,now.month,now.day)
         d = format_date2(getYesterday())
         top = DEFAULT_TOP
     
@@ -84,20 +80,13 @@ def get_highest_top(event, context):
         Limit=top
     )
 
-#    if response.get('Items'):
-#        for i in response['Items']:
-#            logger.info(i['place'] + ' : ' + str(i['temperature_val']))
-
-#    else:
-#        logger.info('あれれ。Itemsないみたい')
-
     if len(response['Items']) == 0:
         logger.info('あれれ。該当データないみたい')
 
 
     body = {
-        "ret": response['Items'],
-        "input": event
+        "result": response['Items']
+#        "input": event
     }
 
     response = {
@@ -114,9 +103,49 @@ def get_highest_top(event, context):
 
 
 def get_lowest_top(event, context):
+    TABLE_NAME = 'dev-jw-lowest'
+    table = dynamo.Table(TABLE_NAME)
+
+    if( event.get('queryStringParameters')):
+        params = event.get('queryStringParameters')
+
+        dd = params.get('date')
+        if dd is not None:
+            d = dd
+        else:
+            d = format_date2( getYesterday() )
+
+        ttop = params.get('top')
+        if ttop is not None:
+            top = int(ttop)
+        else:
+            top = DEFAULT_TOP
+    else:
+        d = format_date2(getYesterday())
+        top = DEFAULT_TOP
+    
+    logger.info('-- 最低気温 --')
+    logger.info('date : '+d)
+
+    response = table.query(
+        IndexName='globalIndex2',
+        KeyConditionExpression=Key('date').eq(d),
+        ScanIndexForward=True,  #昇順か降順か（デフォルトは True=昇順）
+        Limit=top
+    )
+
+    if len(response['Items']) == 0:
+        logger.info('あれれ。該当データないみたい')
+
+
+    body = {
+        "result": response['Items']
+#        "input": event
+    }
+
     response = {
         "statusCode": 200,
-        "body": "",
+        "body": json.dumps(body, cls=DecimalEncoder),
         "headers": {
             "Access-Control-Allow-Origin":"*"
         }
@@ -125,4 +154,3 @@ def get_lowest_top(event, context):
     logger.info(response)
 
     return response
-
