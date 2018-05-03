@@ -204,12 +204,43 @@ functions:
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
 
+
   get_highest_range:
     handler: handler3.get_highest_range
     timeout: 30
     events:
       - http:
           path: highest_range
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_lowest_range:
+    handler: handler3.get_lowest_range
+    timeout: 30
+    events:
+      - http:
+          path: lowest_range
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_rain24h_range:
+    handler: handler3.get_rain24h_range
+    timeout: 30
+    events:
+      - http:
+          path: rain24h_range
+          method: get
+          private: false # APIキーを使用する
+          cors: true  # API GatewayにCORSの設定をする
+
+  get_snow_range:
+    handler: handler3.get_snow_range
+    timeout: 30
+    events:
+      - http:
+          path: snow_range
           method: get
           private: false # APIキーを使用する
           cors: true  # API GatewayにCORSの設定をする
