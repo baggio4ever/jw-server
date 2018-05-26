@@ -5,8 +5,8 @@ from time import sleep
 import json
 
 # 気象庁のサイトからダウンロードしたAMeDAS一覧のCSVファイルを,JSONに変換する
-#  都府県振興局
-#     - 観測所名
+#  {key:value}
+#     観測所名:カナ
 # の形でJSON化。
 # 都府県振興局、および観測所名の登場順は、気象庁からダウンロードしたファイル内の登場順通り
 
@@ -19,20 +19,22 @@ with open(fn,newline='',encoding='utf-8') as html:
 	count2 = 0
 	a = set()
 
-	prectureDict = {}
+	autocompleteDict = {}
 
 	for row in re:
 		if count>0:
-			#     場所           地域            住所
-			str = '{:10}{:10}'.format(row[3],row[0])
+			#                         地域      カナ
+			str = '{:10}{:10}'.format(row[3],row[4])
 			print(str)
 
-			if not row[0] in prectureDict.keys():
-				prectureDict[row[0]] = []
+#			if not row[0] in prectureDict.keys():
+#				prectureDict[row[0]] = []
 
-			if not row[3] in a: # 重複チェック（同じ 観測所名、観測所番号 の行が存在する）
-				prectureDict[row[0]].append(row[3])
-				a.add(row[3])
+#			if not row[3] in autocompleteDict.keys():
+#				autocompleteDict[row[3]] = row[3]
+
+			if not row[4] in autocompleteDict.keys():
+				autocompleteDict[row[3]] = row[4]
 				count2 += 1
 
 		count += 1
@@ -43,16 +45,14 @@ print('読み取り行数: {}'.format(count))
 print('書き込み行数: {}'.format(count2))
 
 print('-----')
-for i in prectureDict.keys():
+for i in autocompleteDict.keys():
 	print(i)
-	for j in prectureDict[i]:
-		print('    '+j)
 
 
 # Pythonオブジェクトをファイル書き込み
-savepath = 'observatory_tree.json'
+savepath = 'observatory_autocompleteDict.json'
 with open(savepath, 'w') as outfile:
-    json.dump(prectureDict, outfile)
+    json.dump(autocompleteDict, outfile)
 
 
 # http://minus9d.hatenablog.com/entry/2015/07/07/225304
